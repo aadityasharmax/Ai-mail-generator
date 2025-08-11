@@ -1,0 +1,164 @@
+<!-- frontend/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Email Assistant</title>
+    <style>
+      /* ... (use all your previous CSS here) ... */
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f2f5f9;
+        padding: 30px;
+        color: #333;
+      }
+      .container {
+        max-width: 800px;
+        margin: auto;
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        text-align: center;
+        color: #0077cc;
+        margin-bottom: 30px;
+      }
+      label {
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: block;
+      }
+      input,
+      textarea,
+      button {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: border 0.2s;
+      }
+      input:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #0077cc;
+      }
+      button {
+        background-color: #0077cc;
+        color: white;
+        border: none;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #005fa3;
+      }
+      .loading {
+        text-align: center;
+        font-weight: bold;
+        color: #555;
+        margin-bottom: 20px;
+      }
+      .footer {
+        text-align: center;
+        margin-top: 40px;
+        font-size: 15px;
+        color: #666;
+        padding-top: 20px;
+        border-top: 1px solid #ddd;
+      }
+      .footer span {
+        font-weight: bold;
+        color: #0077cc;
+      }
+      .footer .symbol {
+        font-size: 18px;
+        margin: 0 5px;
+        color: #0077cc;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>📨 AI-Powered Email Assistant</h1>
+      <label for="recipients">To (Recipient Emails)</label>
+      <input
+        type="text"
+        id="recipients"
+        placeholder="e.g., john@example.com, jane@example.com"
+      />
+      <label for="prompt">Email Intent / Prompt</label>
+      <textarea
+        id="prompt"
+        rows="3"
+        placeholder="e.g., Apology for missing a meeting, or Follow-up after an interview"
+      ></textarea>
+      <button onclick="generateEmail()">Generate Email ✨</button>
+      <div class="loading" id="loading" style="display: none">
+        Generating email using AI...
+      </div>
+      <label for="emailBody">Generated Email (Editable)</label>
+      <textarea
+        id="emailBody"
+        rows="10"
+        placeholder="The generated email will appear here. You can make changes before sending."
+      ></textarea>
+      <button onclick="sendEmail()">Send Email 🚀</button>
+      <div class="footer"></div>
+    </div>
+
+    <script>
+      async function generateEmail() {
+        const prompt = document.getElementById("prompt").value.trim();
+        const loading = document.getElementById("loading");
+
+        if (!prompt) {
+          alert("Please enter an email prompt.");
+          return;
+        }
+
+        loading.style.display = "block";
+
+        try {
+          const response = await fetch("http://localhost:3000/generate-email", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt }),
+          });
+          const data = await response.json();
+          const email = data.choices?.[0]?.message?.content?.trim();
+
+          if (email) {
+            document.getElementById("emailBody").value = email;
+          } else {
+            alert("Failed to generate email. Please try again.");
+          }
+        } catch (error) {
+          alert("Error: " + error.message);
+        } finally {
+          loading.style.display = "none";
+        }
+      }
+
+      function sendEmail() {
+        const recipients = document.getElementById("recipients").value.trim();
+        const emailBody = document.getElementById("emailBody").value.trim();
+
+        if (!recipients || !emailBody) {
+          alert("Both recipient and email content are required.");
+          return;
+        }
+
+        // Real emailing not implemented, just logs and alerts
+        console.log("Sending email to:", recipients);
+        console.log("Email content:\n", emailBody);
+        alert("✅ Email has been 'sent' to: " + recipients);
+      }
+    </script>
+  </body>
+</html>
